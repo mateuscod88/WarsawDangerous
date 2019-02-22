@@ -1,0 +1,86 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Dangerous</title>
+</head>
+<body>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+<script src="\lib\jquery\dist\jquery.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+<style>
+	#dangerous{
+	max-width:1180px;
+	margin:0 auto;
+	}
+</style>
+<div id="dangerous">
+<table id="myTable" class="table">
+    <thead>
+        <tr>
+            <th>
+                Kategoria
+            </th>
+			<th>
+                Miasto
+            </th>
+			<th>
+                Podkategoria
+            </th>
+			<th>
+                Dzielnica
+            </th>
+			<th>
+                Ulica
+            </th>
+			<th>
+                Rodzaj Zgłoszenia
+            </th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+            </td>
+			<td>
+            </td>
+			<td>
+            </td>
+			<td>
+            </td>
+			<td>
+            </td>
+			<td>
+            </td>
+            
+        </tr>
+    </tbody>
+</table>
+</div>
+<script>
+
+$(document).ready( function () {
+    $('#myTable').DataTable( {
+        "ajax": '/Home/GetAllDangerouses',
+		"columns":[
+		{"data":"category"},
+		{"data":"city"},
+		{"data":"subcategory"},
+		{"data":"district"},
+		{"data":"street2"},
+		{"data":"notificationType"}
+		],
+		"sAjaxDataProp": ""
+		
+    });
+} );
+</script>
+</body>
+</html>

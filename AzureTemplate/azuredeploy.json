@@ -1,0 +1,120 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "webAppName": {
+            "type": "string",
+            "metadata": {
+                "description": "Base name of the resource such as web app name and app                      service plan "
+            },
+            "minLength": 2
+        },
+        "serviceOwner": {
+            "type": "string",
+            "metadata": {
+                "description": "Service owner"
+            },
+            "minLength": 2
+        },
+        "WarsawApiUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "Warsaw Api Url "
+            },
+            "minLength": 2
+        },
+        "ENVIRONMENT_TYPE": {
+            "type": "string",
+            "defaultValue":"Development",
+            "allowedValues":
+            [
+                "Development",
+                "Staging",
+                "Production"
+            ],
+            "metadata": {
+                "description": "Environment variable"
+            }
+        },
+        "resourceType": {
+            "type": "string",
+            "defaultValue":"Microsoft.Web/sites",
+            "allowedValues":
+            [
+                "Microsoft.Web/sites",
+                "Microsoft.Sql/servers/databases"
+            ],
+            "metadata": {
+                "description": "Resource type"
+            }
+        },
+        
+        "sku": {
+            "type": "string",
+            "defaultValue": "S1",
+            "metadata": {
+                "description": "The SKU of App Service Plan, by defaut is standard S1"
+            }
+        }
+        ,
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        }
+    },
+    "variables": {
+        "webAppPortalName": "[concat(parameters('webAppName'), '-webapp-',parameters('serviceOwner'))]",
+        "appServicePlanName": "[concat('AppServicePlan-', parameters('webAppName'),'-',parameters('serviceOwner'))]"
+    },
+    "resources": [
+        {
+            "condition": "[equals(parameters('resourceType'),'Microsoft.Web/sites')]",
+            "apiVersion": "2017-08-01",
+            "type": "Microsoft.Web/serverfarms",
+            "kind": "app",
+            "name": "[variables('appServicePlanName')]",
+            "location": "[parameters('location')]",
+            "properties": {},
+            "dependsOn": [],
+            "sku": {
+                "name": "[parameters('sku')]"
+            }
+        },
+        {
+            "condition": "[equals(parameters('resourceType'),'Microsoft.Web/sites')]",
+            "apiVersion": "2016-08-01",
+            "type": "Microsoft.Web/sites",
+            "kind": "app",
+            "name": "[variables('webAppPortalName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+            ]
+        },
+        {
+            "name":"[concat(variables('webAppPortalName'),'/','appSettings')]",
+            "apiVersion": "2016-08-01",
+			"location": "Central US",
+            "scale": null,
+            "type": "Microsoft.Web/sites/config",
+            "dependsOn":[
+                "[resourceId('Microsoft.Web/sites',variables('webAppPortalName'))]"
+            ],
+            "tags":{
+                "displayName":"WebAppSettings"
+            },
+            "properties":{
+                "ASPNETCORE_ENVIRONMENT":"[parameters('ENVIRONMENT_TYPE')]",
+                "WarsawaApiUrl":"[parameters('WarsawApiUrl')]"
+            }
+
+
+        }
+    ]
+}
